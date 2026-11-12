@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Black Sun — System Audit, 12 Nov 2026</title>
+<style>
+:root{--page:#f9f9f7;--surf:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--mut:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--good:#0ca30c;--warn:#fab219;--ser:#ec835a;--crit:#d03b3b;--seq1:#b7d3f6;--seq2:#5598e7;--seq3:#184f95;--neutral:#f0efec}
+@media (prefers-color-scheme:dark){:root{--page:#0d0d0d;--surf:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--grid:#2c2c2a;--axis:#383835;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--neutral:#383835}}
+@media print{:root{--page:#fff;--surf:#fff;--ink:#0b0b0b;--ink2:#52514e;--grid:#e1e0d9;--axis:#c3c2b7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--neutral:#f0efec}}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:30px;line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}h2{font-size:21px;margin:44px 0 6px;letter-spacing:-.01em;break-after:avoid}h3{font-size:15px;margin:0 0 2px}
+p{margin:8px 0}.sub{color:var(--ink2)}.small{font-size:13px;color:var(--ink2)}
+.card{background:var(--surf);border:1px solid var(--grid);border-radius:10px;padding:16px 18px;margin:14px 0;break-inside:avoid}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+.tile{background:var(--surf);border:1px solid var(--grid);border-radius:10px;padding:14px 16px;break-inside:avoid}.tile b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.02em}.tile span{font-size:13px;color:var(--ink2)}.tile i{font-style:normal;font-size:12px;color:var(--mut);display:block;margin-top:4px}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:99px;padding:2px 9px;border:1px solid var(--axis);white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.crit{background:var(--crit)}.ser{background:var(--ser)}.warn{background:var(--warn)}.good{background:var(--good)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}th{color:var(--ink2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.tw{overflow-x:auto}svg{display:block;width:100%;height:auto}svg text{font:12px system-ui,sans-serif;fill:var(--ink2)}svg .v{fill:var(--ink);font-weight:600}svg .m{fill:var(--mut)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:6px 0 2px}.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.verdict{border-left:4px solid var(--crit);padding-left:14px}.bn{border-left:4px solid var(--axis);padding-left:14px;margin:16px 0}.bn h3{font-size:16px}
+.caveat{background:var(--neutral);border-radius:8px;padding:10px 14px;font-size:13.5px}
+ol,ul{padding-left:20px;margin:6px 0}li{margin:3px 0}code{font:12.5px ui-monospace,Menlo,monospace;background:var(--neutral);padding:1px 4px;border-radius:4px}
+#stages,#wf,#funnel{overflow-x:auto}#stages svg,#wf svg,#funnel svg{min-width:760px}
+</style></head><body><main>
+<p class="small">SYSTEM AUDIT · prepared 12 November 2026 · evidence through 8 November 2026</p>
+<h1>Black Sun: the machine is built. The edge is not proven.</h1>
+<p class="sub">Two months of work produced a hardened, well-tested trading platform with a live champion, a full control dashboard and working alerts. But when the strategies were put through the stricter walk-forward test, none of the four live heads passed, and the search has stopped producing new candidates. The next gain comes from strategy and data work, not more dashboard.</p>
+
+<div class="caveat"><b>How to read this.</b> I could not open the Black Sun repository or the desktop from this cloud session, so this audit is reconstructed from the transcripts of 14 of your desktop Claude sessions (September 13 to November 8). Strategy numbers are the last ones printed in those sessions, mostly October 14–17. Nothing here is a live reading from today. Section 9 lists what to re-check on the machine.</div>
+
+<div class="grid g4" style="margin-top:16px">
+<div class="tile"><b>0 / 4</b><span>live heads pass walk-forward validation</span><i>Oct 14, re-confirmed Oct 17</i></div>
+<div class="tile"><b>1</b><span>live champion (SMC, score 58.40) — on the older single-split test only</span><i>Oct 14, cycle 7,430</i></div>
+<div class="tile"><b>7,647</b><span>Matrix generations run</span><i>Oct 17</i></div>
+<div class="tile"><b>1,641</b><span>Python tests passing, up from 479 on Sep 13</span><i>Nov 7 · 7 failing, 6 files uncollectable</i></div>
+</div>
+
+<h2>1. Where the project stands against its goal</h2>
+<p>The mandate written in the agent registry is <i>"pass evaluations and extract payouts from funded accounts"</i>. The path to that runs through five stages. The first three are solid; the fourth is where the project is stuck; the fifth has not started in any transcript I read.</p>
+<div class="card"><div id="stages"></div>
+<p class="small">Stage status is my assessment from the transcripts. No session recorded a passed evaluation, a payout, or live-account P&amp;L.</p></div>
+
+<h2>2. Strategy statistics</h2>
+<div class="card"><h3>Every head fails every walk-forward fold</h3>
+<p class="small">Composite score per fold, 14 Oct 2026. A fold passes only if it clears all gates; none did. "No score" means the fold failed the minimum-trade-count gate outright.</p>
+<div id="wf"></div>
+<div class="legend"><span><span class="sw" style="background:var(--seq1)"></span>low score</span><span><span class="sw" style="background:var(--seq3)"></span>high score</span><span><span class="sw" style="background:var(--neutral);border:1px solid var(--axis)"></span>no score</span><span>✕ = failed gates</span></div>
+<p class="small">After the Oct 17 fix that scales the trade-count floor to fold length, one SMC fold cleared every gate (score 75.14) and SMC's trade-count failures fell from 4 of 4 folds to 3 of 4; Zeus's from 3 to 2. The overall verdict did not change: every head still fails on expectancy, profit-to-drawdown or single-day concentration in at least one fold.</p></div>
+
+<div class="grid g2">
+<div class="card"><h3>Profit factor against the 1.5 gate</h3><p class="small">Fleet leaderboard, out-of-sample. Sep 13 for ORB NY; Sep 28 for the rest.</p><div id="pf"></div></div>
+<div class="card"><h3>Matrix best score per head</h3><p class="small">Single-split score, 17 Oct, generation 7,647. Neo is the only head not flagged ready.</p><div id="mx"></div></div>
+</div>
+
+<div class="card tw"><h3>Head by head</h3><table>
+<tr><th>Head</th><th>Strategy</th><th>Last recorded numbers</th><th>Diagnosis</th></tr>
+<tr><td><b>SMC</b></td><td>Smart-money state machine</td><td>Champion, score 58.40 (Oct 14); Matrix best 64.3 (Oct 17). Only 24 trades in a 3.5-year out-of-sample window.</td><td>First head ever promoted (Sep 25). Too few trades to validate: 6–13 per walk-forward fold.</td></tr>
+<tr><td><b>Kuma</b></td><td>NQ opening-range breakout</td><td>467 trades, PF 1.15, probability of ruin 1.0 (Sep 28); Matrix best 77.5 (Oct 17)</td><td>Structural sizing problem. NQ lot rounding means cutting risk removes trades instead of shrinking drawdown. 4,608 configs tested without a fix.</td></tr>
+<tr><td><b>Zeus</b></td><td>NQ volume-profile momentum</td><td>100 trades, PF 0.85, probability of ruin 0.94, fails 6 of 8 gates (Sep 28)</td><td>Weak on nearly every axis. Its own mutation search was switched off on Sep 24 after 1,280 configs and zero wins.</td></tr>
+<tr><td><b>Neo</b></td><td>NQ order-flow scalp</td><td>Matrix best 55.2, not ready (Oct 17); walk-forward folds 23.5–46.3</td><td>Most consistent across folds, but fails in-sample expectancy and profit-to-drawdown in all four.</td></tr>
+<tr><td>Argus-Zeus</td><td>Fleet population, NQ</td><td>174 trades, PF 1.29, probability of ruin 0.195 (Sep 28)</td><td>Closest NQ candidate. An entry delay lifted PF to about 1.37, still under 1.5.</td></tr>
+<tr><td>ORB NY · GBPUSD</td><td>Fleet population</td><td>Sharpe 4.36, PF 1.98, probability of ruin 0.0 (Sep 13)</td><td>Strong signal blocked by one gate, traced to the sizing units bug below.</td></tr>
+</table></div>
+
+<h2>3. Is the evolution healthy?</h2>
+<p><b>The engine runs; the mutation is not producing fitter strategies.</b> The daemons have been evolving continuously, and the scores inside the single-split test rose (Kuma 51.5 on Sep 28 to 77.5 on Oct 17). That rise did not survive walk-forward, which is the sign of a search fitting one data split rather than finding a durable edge.</p>
+<div class="card"><h3>From search volume to validated edge</h3><p class="small">Counts as last recorded. Bars are not to a common scale; each row is a stage of the same pipeline.</p><div id="funnel"></div></div>
+<ul>
+<li><b>A units bug poisoned the search for weeks.</b> All nine strategy-family genomes swept <code>risk_per_trade_pct</code> over 0.25–1.0, which the sizing code reads as 25%–100% of equity. Against the $500 per-trade cap, every trade breached, so no candidate could pass ruin-prevention. This was identified on Sep 14 as a cause of "1,690+ generations, 0 graduations". The session ended with the fix waiting for your approval, and the champion's ID on Oct 14 still contains <code>risk_per_trade_pct-0p25</code>. <b>I could not confirm the fix was ever applied.</b></li>
+<li><b>Two search loops are tapped out.</b> Zeus's own mutation search is disabled; Kuma's cannot fix a sizing problem by tuning parameters.</li>
+<li><b>The idea pipeline is empty.</b> The discovery agent that is meant to feed new strategies made zero proposals in every run on Nov 4–6. The local model never called a tool, and three of four sources were blocked (GitHub 401, QuantConnect 202, Reddit 403).</li>
+<li><b>Overfitting checks are not running.</b> The deflated-Sharpe gate tests fail and the overfitting / PBO test files cannot be collected because <code>scipy</code> is missing from the daemon environment. These have been carried as "pre-existing, unrelated" failures since at least Nov 5.</li>
+<li><b>One clean negative result.</b> The liquidity-sweep reversal signal was tested three ways, found to have no edge, and dropped (Oct 8–14). That is the process working as intended.</li>
+</ul>
+
+<h2>4. What was achieved</h2>
+<div class="grid g2">
+<div class="card"><h3>Test suite growth</h3><p class="small">Python tests passing, by session date.</p><div id="tests"></div></div>
+<div class="card"><h3>Workstream completion</h3><p class="small">Tasks done of tasks planned, as of each stream's last session.</p><div id="ws"></div></div>
+</div>
+<div class="card tw"><table>
+<tr><th>When</th><th>Achievement</th></tr>
+<tr><td>Sep 13–14</td><td>Fixed the PropGuard daily-profit-lock bug; found the genome risk-units bug.</td></tr>
+<tr><td>Sep 25–27</td><td>SMC wired into Matrix; a scorer crash and a "champion flap" bug fixed; SMC became the first live champion and held through a 2-day soak.</td></tr>
+<tr><td>Oct 14–17</td><td>Rolling walk-forward validation built, reviewed, merged (<code>de94a530</code>); trade-count scaling fix (<code>ec683850</code>). Execution layer brought to 6 of 6 core files under test.</td></tr>
+<tr><td>Oct 15–17</td><td>Recovered a roughly 2-day live-feed outage and a stuck Fleet watchdog.</td></tr>
+<tr><td>Nov 3–4</td><td>Guardian hardening, log-flood and promotion fixes; regime-breakdown and parameter-sensitivity panels; branch pushed.</td></tr>
+<tr><td>Nov 5–6</td><td>Six dashboard sub-projects shipped: live execution and risk visibility, alerting, research analytics, strategy-proposal review, disarm-only automation rules, and a Flatten Now control that reuses the tested flatten path and adds no order-submission code. Telegram alerts connected.</td></tr>
+<tr><td>Nov 6</td><td>On-chain crew contracts merged (PR #17, 17 of 17 tests).</td></tr>
+<tr><td>Nov 7</td><td>Three-agent audit of everything built: 11 findings. Both critical ones fixed the same day.</td></tr>
+</table></div>
+
+<h2>5. The last five sessions on the system</h2>
+<div class="card tw"><table>
+<tr><th>Session · last active</th><th>What happened</th><th>Where it stopped</th></tr>
+<tr><td><b>Top setups of the month IFVG</b><br><span class="small">Nov 6–8</span></td><td>Telegram troubleshooting (the alert daemon was running with a stale environment); the full audit; both critical fixes (<code>5d4cbbde</code>, <code>6b0f2f8c</code>); trade-journal design.</td><td>Hit the session limit on Nov 8. The 4 high, 3 medium and 2 low findings have no recorded fix. Journal design approved through section 2.</td></tr>
+<tr><td><b>Quant terminal chart engine, Phase 2</b><br><span class="small">Nov 4–8</span></td><td>12-task build of the React chart engine with a review after every task.</td><td>Tasks 1–8 done and approved. Task 9 (ChartPane) died on the session limit.</td></tr>
+<tr><td><b>Extract GitHub repo from Instagram</b><br><span class="small">Nov 6–8</span></td><td>On-chain crew contracts: PR #17 opened, checked, merged.</td><td>Sepolia deployment waiting on a deployer key and a verified collateral-token address from you.</td></tr>
+<tr><td><b>The final Task</b><br><span class="small">Nov 3–6</span></td><td>Branch push; discovery agent rebuilt as plan-then-run; A/B test against the old loop; source failures diagnosed; arXiv and GitHub search fixed.</td><td>A/B re-run after the source fixes was starting when the transcript ends. Still zero proposals. New cycle is not wired into the daemon.</td></tr>
+<tr><td><b>Integrating terminal quant</b><br><span class="small">Nov 5–6</span></td><td>Dashboard sub-projects 4, 5 and 6; Telegram bot setup.</td><td>Complete.</td></tr>
+</table></div>
+
+<h2>6. Bottlenecks and where to go from each</h2>
+<div class="bn" style="border-color:var(--crit)"><h3><span class="dot crit"></span>1 · No strategy survives walk-forward</h3>
+<p>The live champion trades on a standard the system's own stricter test rejects. The decision "accept walk-forward or stay on single-split" has been open since Oct 17.</p>
+<p><b>Go:</b> keep SMC in paper or minimum size and treat walk-forward as the bar for anything risking evaluation capital. Stop tuning the four heads' parameters. Put the effort into the two candidates with real signal (ORB NY GBPUSD, Argus-Zeus) and into new ideas.</p></div>
+<div class="bn" style="border-color:var(--crit)"><h3><span class="dot crit"></span>2 · Sizing units bug, fix unconfirmed</h3>
+<p><b>Go:</b> open <code>configs/fleet/genomes/*.yaml</code> and check the <code>risk_per_trade_pct</code> ranges. If they still read 0.25–1.0, change them to 0.0025–0.01, add a load-time assertion that rejects any value above 0.02, and re-score the leaderboard. ORB NY GBPUSD may graduate on this alone.</p></div>
+<div class="bn" style="border-color:var(--ser)"><h3><span class="dot ser"></span>3 · Too little data to validate anything</h3>
+<p>There is a 524-day gap in NQ one-minute history, and SMC produces about 7 trades a year. The Databento key has been waiting on you since Oct 16.</p>
+<p><b>Go:</b> create the Databento account ($125 free credit covers the backfill) and put the key in <code>.env</code> yourself. Then re-run walk-forward on all heads. For SMC, add instruments so the trade count supports a verdict.</p></div>
+<div class="bn" style="border-color:var(--ser)"><h3><span class="dot ser"></span>4 · Overfitting guards switched off in practice</h3>
+<p><b>Go:</b> install <code>scipy</code> in <code>.venv-daemons</code>, get the 6 uncollectable files and 7 failing tests green, and make deflated Sharpe and PBO part of the promotion gate. With 7,600+ generations of trials, this is the control that matters most.</p></div>
+<div class="bn" style="border-color:var(--ser)"><h3><span class="dot ser"></span>5 · Nine audit findings left open on live-money controls</h3>
+<p>Flatten Now can silently do nothing and still show "cleared"; its PENDING state can stick; proposal approval has no lock; regime breakdown can hang a request.</p>
+<p><b>Go:</b> resume that session and finish high, then medium, then low, as you instructed on Nov 7. Do the two Flatten items before trusting the button.</p></div>
+<div class="bn" style="border-color:var(--warn)"><h3><span class="dot warn"></span>6 · The idea pipeline produces nothing</h3>
+<p><b>Go:</b> finish the A/B re-run, wire plan-then-run into the daemon, and replace the 14B local model in the judge seat if it still fails. Until then, feed candidates by hand from the reel research.</p></div>
+<div class="bn" style="border-color:var(--warn)"><h3><span class="dot warn"></span>7 · One fragile PC runs everything</h3>
+<p>The live feed depends on a TradingView Desktop window with a specific chart pane open; it was down two days before anyone noticed. On Nov 4 the PC had 690 MB of 32 GB free while paper trading ran.</p>
+<p><b>Go:</b> alert on feed staleness through the Telegram bot that now works, add a watchdog-of-watchdogs check, and stop running research jobs on the trading machine during market hours.</p></div>
+<div class="bn" style="border-color:var(--warn)"><h3><span class="dot warn"></span>8 · Work is spread thin and keeps hitting the session limit</h3>
+<p>Three sessions died mid-task on Nov 8. Up to three sessions commit to the same branch at once. Recent effort went to the dashboard, chart engine, journal and on-chain contracts while bottlenecks 1–4 sat.</p>
+<p><b>Go:</b> one strategy-critical stream at a time. Park the chart engine, journal and Sepolia deployment until a strategy passes walk-forward.</p></div>
+<div class="bn" style="border-color:var(--crit)"><h3><span class="dot crit"></span>9 · Telegram bot token exposed</h3>
+<p>The bot token was pasted into chat in plain text several times and is stored in those transcripts.</p>
+<p><b>Go:</b> revoke it in @BotFather, issue a new one, and set it directly as the Windows environment variable.</p></div>
+
+<h2>7. Recommended order</h2>
+<div class="card"><ol>
+<li><b>Today:</b> rotate the Telegram token. Check the genome risk ranges.</li>
+<li><b>This week:</b> Databento key and NQ backfill; scipy and the overfitting tests; finish the nine audit findings.</li>
+<li><b>Next:</b> re-score the Fleet with correct sizing, then run walk-forward plus deflated Sharpe on every population, not only the four heads.</li>
+<li><b>Then decide:</b> if a candidate passes, paper-trade it for a fixed soak period before any evaluation account. If none passes, the constraint is ideas, and the discovery pipeline becomes the top priority.</li>
+<li><b>Only after that:</b> chart engine Task 9–12, trade journal, Sepolia.</li>
+</ol></div>
+
+<h2>8. Projection</h2>
+<p>I cannot give a date for a passed evaluation, and no transcript contains one. What the evidence supports: the platform is ready to carry a validated strategy to a funded account as soon as one exists. Nothing in two months of search has produced one under the stricter test. The quickest real test of whether an edge already exists in the system is items 2 and 3 above, which are days of work, not weeks.</p>
+
+<h2>9. What I could not verify</h2>
+<ul>
+<li>Anything after Nov 8, including whether daemons, feeds and the champion are running today.</li>
+<li>Live or paper P&amp;L, the Topstep account balance, and whether any evaluation has been attempted.</li>
+<li>The current Fleet leaderboard and generation counts (latest seen: Sep 28 and Oct 17).</li>
+<li>Whether the genome fix and the nine remaining audit fixes were applied in sessions I did not read.</li>
+<li>I read the most recent 200–400 events of each session, not full histories; older detail may be missing.</li>
+</ul>
+<p class="small">To turn this into a live audit, attach the <code>Agent-Ecosystem-Vault</code> repository to a cloud session or run the audit from a session on the PC.</p>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+function S(w,h){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox',`0 0 ${w} ${h}`);s.setAttribute('role','img');return s}
+function E(p,t,a,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;p.appendChild(e);return e}
+function tip(e,t){E(e,'title',{},t)}
+// stages
+(()=>{const st=[['Platform & infrastructure','Built','good'],['Risk controls & execution','Built, 9 findings open','warn'],['Search & evolution engine','Running, not converging','ser'],['Validated edge','None under walk-forward','crit'],['Evaluation & payouts','Not started','crit']];
+const s=S(1000,96),w=188,g=15;st.forEach((x,i)=>{const X=i*(w+g);E(s,'rect',{x:X,y:8,width:w,height:76,rx:8,fill:'var(--surf)',stroke:'var(--axis)'});E(s,'rect',{x:X,y:8,width:6,height:76,rx:3,fill:`var(--${x[2]})`});E(s,'text',{x:X+18,y:30,class:'m'},'STAGE '+(i+1));E(s,'text',{x:X+18,y:50,class:'v'},x[0]);E(s,'text',{x:X+18,y:70},x[1]);if(i<4)E(s,'path',{d:`M${X+w+3} 46h9`,stroke:'var(--axis)','stroke-width':2})});document.getElementById('stages').appendChild(s)})();
+// walk-forward grid
+(()=>{const d={Zeus:[null,null,4.55,null],Neo:[23.54,46.33,39.9,39.13],Kuma:[14.37,11.72,37.5,37.09],SMC:[null,null,null,null]};const s=S(1000,230),cw=215,ch=42,x0=110,y0=30;
+['Fold 1','Fold 2','Fold 3','Fold 4'].forEach((f,i)=>E(s,'text',{x:x0+i*cw+cw/2,y:18,'text-anchor':'middle'},f));
+Object.keys(d).forEach((h,r)=>{E(s,'text',{x:0,y:y0+r*(ch+6)+26,class:'v'},h);d[h].forEach((v,c)=>{const col=v==null?'var(--neutral)':v<20?'var(--seq1)':v<38?'var(--seq2)':'var(--seq3)';const R=E(s,'rect',{x:x0+c*cw+2,y:y0+r*(ch+6),width:cw-4,height:ch,rx:4,fill:col,stroke:v==null?'var(--axis)':'none'});tip(R,`${h}, fold ${c+1}: ${v==null?'no score (trade count too low)':'score '+v} — failed gates`);E(s,'text',{x:x0+c*cw+cw/2,y:y0+r*(ch+6)+26,'text-anchor':'middle',style:`fill:${v==null?'var(--ink2)':v<20?'#0b0b0b':'#fff'};font-weight:600`},(v==null?'no score':v.toFixed(1))+'  ✕')})});document.getElementById('wf').appendChild(s)})();
+// horizontal bars helper
+function hbar(id,rows,max,opt={}){const lh=34,x0=opt.x0||150,W=480,s=S(W,rows.length*lh+34),pw=W-x0-52;
+rows.forEach((r,i)=>{const y=i*lh+6;E(s,'text',{x:0,y:y+15},r[0]);const w=Math.max(2,r[1]/max*pw);const b=E(s,'path',{d:`M${x0} ${y}h${w-4}a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-${w-4}z`,fill:r[3]||'var(--s1)'});tip(b,r[0]+': '+r[2]);E(s,'text',{x:x0+w+6,y:y+15,class:'v'},r[2])});
+const by=rows.length*lh+4;E(s,'path',{d:`M${x0} 0V${by}`,stroke:'var(--axis)'});
+if(opt.gate){const gx=x0+opt.gate/max*pw;E(s,'path',{d:`M${gx} 0V${by}`,stroke:'var(--ink2)','stroke-dasharray':'4 3'});E(s,'text',{x:gx,y:by+16,'text-anchor':'middle'},opt.gl)}
+document.getElementById(id).appendChild(s)}
+hbar('pf',[['ORB NY · GBPUSD',1.98,'1.98'],['Argus-Zeus · NQ',1.29,'1.29'],['Kuma ORB · NQ',1.15,'1.15'],['Zeus VP · NQ',0.85,'0.85']],2.6,{gate:1.5,gl:'gate 1.5'});
+hbar('mx',[['Kuma',77.5,'77.5 · ready'],['SMC',64.3,'64.3 · ready'],['Neo',55.2,'55.2 · not ready'],['Zeus',51.1,'51.1 · ready']],100,{x0:70});
+hbar('ws',[['Dashboard sub-projects',6,'6 of 6','var(--s1)'],['Chart engine Phase 2',8/12*6,'8 of 12','var(--s1)'],['Audit findings fixed',2/11*6,'2 of 11','var(--s1)'],['Walk-forward heads passing',0,'0 of 4','var(--s1)'],['Discovery proposals',0,'0','var(--s1)']],6,{x0:190});
+// funnel
+(()=>{const r=[['Lineage records evaluated','30,087','Sep 13 · file grew to 165 MB by Oct 17',1],['Fleet populations','16','Sep 13',.62],['Populations passing all gates','0','Sep 13',0],['Live champion, single split','1','SMC, since Sep 25',.1],['Heads passing walk-forward','0 of 4','Oct 17',0]];const s=S(1000,r.length*40+6);
+r.forEach((x,i)=>{const y=i*40+4,w=Math.max(2,x[3]*420);E(s,'text',{x:0,y:y+20},x[0]);E(s,'rect',{x:260,y:y+4,width:w,height:22,rx:4,fill:'var(--s1)'});E(s,'text',{x:260+w+10,y:y+20,class:'v'},x[1]);E(s,'text',{x:260+w+80,y:y+20,class:'m'},x[2])});document.getElementById('funnel').appendChild(s)})();
+// tests line
+(()=>{const d=[['Sep 13',479,0],['Oct 14',990,31],['Oct 17',1102,34],['Nov 5',1595,53],['Nov 6',1624,54],['Nov 7',1641,55]];const W=480,H=230,x0=44,x1=W-44,y0=190,y1=20,s=S(W,H),X=t=>x0+t/55*(x1-x0),Y=v=>y0-v/1800*(y0-y1);
+[0,600,1200,1800].forEach(v=>{E(s,'path',{d:`M${x0} ${Y(v)}H${x1}`,stroke:'var(--grid)'});E(s,'text',{x:x0-6,y:Y(v)+4,'text-anchor':'end',class:'m'},v.toLocaleString())});
+E(s,'path',{d:d.map((p,i)=>(i?'L':'M')+X(p[2])+' '+Y(p[1])).join(''),fill:'none',stroke:'var(--s1)','stroke-width':2,'stroke-linejoin':'round'});
+d.forEach((p,i)=>{const c=E(s,'circle',{cx:X(p[2]),cy:Y(p[1]),r:4.5,fill:'var(--s1)',stroke:'var(--surf)','stroke-width':2});tip(c,`${p[0]}: ${p[1].toLocaleString()} passing`);if([0,1,5].includes(i)){E(s,'text',{x:X(p[2])+(i==0?8:0),y:Y(p[1])-10,'text-anchor':i==5?'end':i==0?'start':'middle',class:'v'},p[1].toLocaleString())}});
+[[0,'Sep 13'],[31,'Oct 14'],[55,'Nov 7']].forEach(t=>E(s,'text',{x:X(t[0]),y:y0+18,'text-anchor':'middle',class:'m'},t[1]));document.getElementById('tests').appendChild(s)})();
+</script></body></html>
